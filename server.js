@@ -16,12 +16,11 @@ var port = 80;
 server.listen(port);
 
 app.get('/', (req, res) => { // DONE
-    res.redirect("/pay"); // TODO: Should be changed to redirect to "/account" by default.
+    res.redirect("/pay"); // TODO: Should be changed to redirect to "/account" by default. Make login, signup and login validation.
 });
-// TODO: Make the payment view where it shows you the receiver of the payment, the amount for the payment & the payer's account balance, along with a "PAY" button.
-app.get('/pay/:receiver_id/:amount', (req, res) => {
+// DONE: Make the payment view where it shows you the receiver of the payment, the amount for the payment & the payer's account balance, along with a "PAY" button.
+app.get('/pay', (req, res) => {
     res.sendFile(__dirname + "/pay/index.html");
-    console.log(`Receiver ID: ${req.params.receiver_id}, Amount: ${req.params.amount}`);
 });
 app.get('/account', (req, res) => { // DONE
     res.sendFile(__dirname + "/account/index.html");
@@ -31,6 +30,16 @@ io.on('connection', socket => {
     socket.on("get-account-details", (id) => {
         sqlRequests.updateAccountDetails(id, (accountDetails) => {
             socket.emit("update-account-details", accountDetails);
+        });
+    });
+    socket.on("validate-payment-details", (paymentDetails) => {
+        sqlRequests.isValidUser(paymentDetails, (res) => {
+            if (res.isValid == true) {
+                socket.emit("update-payment-details", res.paymentDetails);
+            }
+            else {
+                socket.emit("invalid-user");
+            }
         });
     });
 });

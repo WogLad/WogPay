@@ -6,9 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WogPay</title>
     <link rel="stylesheet" href="/style.css">
-    <!-- <script src="/pay/index.js"></script> -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script defer src="/pay/index.js"></script>
 </head>
 <body>
-    <h1>WogPay</h1>
+    <br>
+    <h1>WogPay Transaction</h1>
+    <br><br>
+
+    <div>
+        <div id="accountName">
+            Receiver's Name: N/A
+        </div>
+        <br>
+        <div id="accountID">
+            Receiver's ID: N/A
+        </div>
+        <br>
+        <div id="paymentAmount">
+            Amount: <b>N/A</b>
+        </div>
+    </div>
+
+    <br><br>
+    <div>
+        <button onclick="makePayment()">PAY</button>
+    </div>
 </body>
 </html>

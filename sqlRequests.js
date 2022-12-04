@@ -22,8 +22,6 @@ function logUsers() {
 }
 
 function addNewUser(name, password, balance=0) {
-    const connection = mysql.createConnection(sqlConnectionData);
-    
     connection.query(`INSERT INTO USERS VALUES("${genRanHex(8)}", "${name}", ${balance}, ${password})`, (error, results, fields) => {
         if (error) {
             return console.error(error.message);
@@ -33,8 +31,6 @@ function addNewUser(name, password, balance=0) {
 }
 
 function updateAccountDetails(id, callback) {
-    const connection = mysql.createConnection(sqlConnectionData);
-    
     connection.query(`SELECT name,balance FROM USERS WHERE id = "${id}"`, (error, results, fields) => {
         if (error) {
             return console.error(error.message);
@@ -44,4 +40,17 @@ function updateAccountDetails(id, callback) {
     });
 }
 
-module.exports = {logUsers, addNewUser, updateAccountDetails};
+function isValidUser(paymentDetails, callback) {
+    connection.query(`SELECT * FROM USERS WHERE id = "${paymentDetails.id}"`, (error, results, fields) => {
+        if (error) {
+            return console.error(error.message);
+        }
+        
+        if (results.length == 1) {
+            return callback({isValid: true, paymentDetails: {id: results[0].id, name: results[0].name, amount: paymentDetails.amount}});
+        }
+        return callback({isValid: false});
+    });
+}
+
+module.exports = {logUsers, addNewUser, updateAccountDetails, isValidUser};
