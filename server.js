@@ -16,7 +16,7 @@ var port = 80;
 server.listen(port);
 
 app.get('/', (req, res) => { // DONE
-    res.redirect("/pay"); // TODO: Should be changed to redirect to "/account" by default. Make login, signup and login validation.
+    res.redirect("/account"); // DONE: Should be changed to redirect to "/account" by default. Make login, signup and login validation.
 });
 // DONE: Make the payment view where it shows you the receiver of the payment, the amount for the payment & the payer's account balance, along with a "PAY" button.
 app.get('/pay', (req, res) => {
@@ -51,6 +51,15 @@ io.on('connection', socket => {
                 socket.emit("update-payment-status", "Payment FAILED due to payer possessing INSUFFICIENT FUNDS");
             }
         });
+    });
+    socket.on("validate-login-details", (loginDetails) => {
+        sqlRequests.validateLoginDetails(loginDetails, (isValid) => {
+            socket.emit("login-validation-response", isValid);
+        });
+    });
+    socket.on("create-new-user", (userLoginDetails) => {
+        var id = sqlRequests.addNewUser(userLoginDetails.name, userLoginDetails.password);
+        socket.emit("update-user-id", id);
     });
 });
 

@@ -22,12 +22,14 @@ function logUsers() {
 }
 
 function addNewUser(name, password, balance=0) {
-    connection.query(`INSERT INTO USERS VALUES("${genRanHex(8)}", "${name}", ${balance}, "${password}")`, (error, results, fields) => {
+    const id = genRanHex(8);
+    connection.query(`INSERT INTO USERS VALUES("${id}", "${name}", ${balance}, "${password}")`, (error, results, fields) => {
         if (error) {
             return console.error(error.message);
         }
-        console.log("Added New User Successfully"); 
+        console.log(`Added New User (${name}) Successfully`); 
     });
+    return id;
 }
 
 function updateAccountDetails(id, callback) {
@@ -36,7 +38,7 @@ function updateAccountDetails(id, callback) {
             return console.error(error.message);
         }
         console.log(`Retreived balance of ${results[0].name}: ${results[0].balance}`);
-        return callback({name: results[0].name, balance: results[0].balance});
+        return callback({id: id, name: results[0].name, balance: results[0].balance});
     });
 }
 
@@ -79,4 +81,17 @@ function tryToMakePayment(transactionDetails, callback) {
     });
 }
 
-module.exports = {logUsers, addNewUser, updateAccountDetails, isValidUser, tryToMakePayment};
+function validateLoginDetails(loginDetails, callback) {
+    connection.query(`SELECT * FROM USERS WHERE id = "${loginDetails.id}" AND password = "${loginDetails.password}"`, (error, results, fields) => {
+        if (error) {
+            return console.error(error.message);
+        }
+        
+        if (results.length == 1) {
+            return callback(true);
+        }
+        return callback(false);
+    });
+}
+
+module.exports = {logUsers, addNewUser, updateAccountDetails, isValidUser, tryToMakePayment, validateLoginDetails};
