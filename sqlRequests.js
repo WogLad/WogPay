@@ -22,7 +22,7 @@ function logUsers() {
 }
 
 function addNewUser(name, password, balance=0) {
-    connection.query(`INSERT INTO USERS VALUES("${genRanHex(8)}", "${name}", ${balance}, ${password})`, (error, results, fields) => {
+    connection.query(`INSERT INTO USERS VALUES("${genRanHex(8)}", "${name}", ${balance}, "${password}")`, (error, results, fields) => {
         if (error) {
             return console.error(error.message);
         }
@@ -53,4 +53,30 @@ function isValidUser(paymentDetails, callback) {
     });
 }
 
-module.exports = {logUsers, addNewUser, updateAccountDetails, isValidUser};
+function tryToMakePayment(transactionDetails, callback) {
+    connection.query(`SELECT id,balance FROM USERS WHERE id IN ("${transactionDetails.payer}", "${transactionDetails.receiver}")`, (error, results, fields) => {
+        if (error) {
+            return console.error(error.message);
+        }
+
+        var payerReceiverBalances = {payer: 0, receiver: 0};
+        if (results[0].id == transactionDetails.payer) {
+            payerReceiverBalances.payer = results[0].balance;
+            payerReceiverBalances.receiver = results[1].balance;
+        }
+        else {
+            payerReceiverBalances.payer = results[1].balance;
+            payerReceiverBalances.receiver = results[0].balance;
+        }
+        
+        if (results.length == 2 && payerReceiverBalances.payer >= transactionDetails.amount) {
+            connection.query(`UPDATE USERS SET balance = ${payerReceiverBalances.payer - transactionDetails.amount} WHERE id = "${transactionDetails.payer}"`);
+            connection.query(`UPDATE USERS SET balance = ${payerReceiverBalances.receiver + transactionDetails.amount} WHERE id = "${transactionDetails.receiver}"`);
+            logUsers();
+            return callback(true);
+        }
+        return callback(false);
+    });
+}
+
+module.exports = {logUsers, addNewUser, updateAccountDetails, isValidUser, tryToMakePayment};

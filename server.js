@@ -42,6 +42,16 @@ io.on('connection', socket => {
             }
         });
     });
+    socket.on("make-payment", (transactionDetails) => {
+        sqlRequests.tryToMakePayment(transactionDetails, (isSuccess) => {
+            if (isSuccess) {
+                socket.emit("update-payment-status", "Payment was SUCCESSFUL");
+            }
+            else {
+                socket.emit("update-payment-status", "Payment FAILED due to payer possessing INSUFFICIENT FUNDS");
+            }
+        });
+    });
 });
 
 // DONE: Make the sql print the users from SQL.
