@@ -72,8 +72,8 @@ function tryToMakePayment(transactionDetails, callback) {
         }
         
         if (results.length == 2 && payerReceiverBalances.payer >= transactionDetails.amount) {
-            connection.query(`UPDATE USERS SET balance = ${payerReceiverBalances.payer - transactionDetails.amount} WHERE id = "${transactionDetails.payer}"`);
-            connection.query(`UPDATE USERS SET balance = ${payerReceiverBalances.receiver + transactionDetails.amount} WHERE id = "${transactionDetails.receiver}"`);
+            connection.query(`UPDATE USERS SET balance = balance - ${Number(transactionDetails.amount)} WHERE id = "${transactionDetails.payer}"`);
+            connection.query(`UPDATE USERS SET balance = balance + ${Number(transactionDetails.amount)} WHERE id = "${transactionDetails.receiver}"`);
             logUsers();
             return callback(true);
         }

@@ -25,6 +25,9 @@ app.get('/pay', (req, res) => {
 app.get('/account', (req, res) => { // DONE
     res.sendFile(__dirname + "/account/index.html");
 });
+app.get('/qrcode', (req, res) => { // DONE
+    res.sendFile(__dirname + "/qrcode/index.html");
+});
 
 io.on('connection', socket => {
     socket.on("get-account-details", (id) => {

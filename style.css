@@ -23,3 +23,15 @@ button {
 button:hover {
     scale: 1.4;
 }
+
+#qrcode {
+    width:160px;
+    height:160px;
+    margin-top:15px;
+    margin-bottom: 15px;
+    margin: auto;
+}
+
+a {
+    color: white;
+}
